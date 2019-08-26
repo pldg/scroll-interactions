@@ -166,3 +166,5 @@ function isNonEmptyString(val) {
 function isBoolean(val) {
   return typeof val === 'boolean';
 }
+
+module.exports = scrollzzz;
