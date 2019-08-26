@@ -23,7 +23,7 @@ Lightweight zero-dependency package which use [IntersectionObserver](https://dev
 const scroller = scrollzzz({
   entries: '.entry',
   trigger: 0.5,
-  debug: ''
+  debug: true
 });
 
 scroller
