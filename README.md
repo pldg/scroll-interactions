@@ -10,7 +10,7 @@ Lightweight zero-dependency package which use [IntersectionObserver](https://dev
 ### CDN
 
 ```html
-<script src="https://unpkg.com/scrollzzz/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/pldg/scrollzzz/index.min.js"></script>
 ```
 
 ### NPM
