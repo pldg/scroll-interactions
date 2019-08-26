@@ -2,6 +2,18 @@
 
 Lightweight zero-dependency package which use [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to check when an element intersect a boundary line inside the viewport.
 
+## Install
+
+### CDN
+
+```html
+<script src="https://unpkg.com/scrollzzz/index.min.js"></script>
+```
+
+### NPM
+
+`npm install --save scrollzzz`
+
 ## Quick start
 
 ```js
