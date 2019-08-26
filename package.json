@@ -1,6 +1,6 @@
 {
   "name": "scrollzzz",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Lightweight zero-dependency package which use IntersectionObserver to check when an element intersect a boundary line inside the viewport",
   "main": "index.js",
   "directories": {

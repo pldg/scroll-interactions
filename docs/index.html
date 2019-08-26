@@ -66,12 +66,14 @@
     scroller
       .init()
       .onIntersect(({ direction, entry }) => {
-        const element = entry.target.classList[1];
         const isIntersecting = entry.isIntersecting;
-        console.log(direction, element, isIntersecting);
+        const target = entry.target;
+        console.log(direction, target.classList[1], isIntersecting);
         info_elem.textContent =
           `direction: ${direction}, ` +
           `isIntersecting: ${isIntersecting}`;
+        if (isIntersecting) target.style.backgroundColor = 'lightblue';
+        else target.style.backgroundColor = 'burlywood';
       });
 
     disconnect_elem.addEventListener('click', scroller.disconnect);

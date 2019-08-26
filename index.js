@@ -43,7 +43,6 @@ function scrollzzz({
   function showDebugTrigger() {
     const el = document.createElement('div');
     const text = document.createElement('p');
-
     el.style.position = 'fixed';
     el.style.top = '0';
     el.style.width = '100%';
@@ -51,20 +50,18 @@ function scrollzzz({
     el.style.borderTop = '2px dashed grey';
     el.style.zIndex = '9999';
     el.style.marginTop = `${trigger * 100}vh`;
-    el.setAttribute('class', debugTriggerClassName());
-
     text.style.fontFamily = 'monospace';
     text.style.color = 'grey';
     text.style.margin = '0';
     text.style.padding = '6px';
     text.innerText = `entries: "${entries}", trigger: ${trigger}`;
-
+    el.setAttribute('class', debugTriggerClassName());
     el.appendChild(text);
     document.body.appendChild(el);
   }
 
   function debugTriggerClassName() {
-    return `scrollzzz-trigger--${entries.substring(1)}`;
+    return `scrollzzz-trigger--${entries}`;
   }
 
   function removeDebugTrigger() {
@@ -73,8 +70,8 @@ function scrollzzz({
   }
 
   /**
-   * Because the sum of `rootMargin` top and bottom is always -100% the root
-   * collapse into a single (boundary) line:
+   * Because the sum of `rootMargin` top and bottom is -100% the root collapse
+   * into a single (boundary) line:
    *
    * - '-100% 0% 0% 0%' -> bottom
    * - '0% 0% -100% 0%' -> top
@@ -102,36 +99,29 @@ function scrollzzz({
 
   function scrollDirection() {
     let previousY = 0;
-
     return function getScrollDirection() {
       const y = window.pageYOffset;
       let d = 'down';
-
       if (y >= previousY) d = 'down';
       else if (y < previousY) d = 'up';
-
       previousY = window.pageYOffset;
-
       return d;
     };
   }
 
   api.init = () => {
-    if (!isInitialized) {
-      io = new IntersectionObserver(handleIntersect, {
-        rootMargin: setRootMargin()
-      });
-      elements.forEach(el => io.observe(el));
-      if (debug === true) showDebugTrigger();
-      isInitialized = true;
-      return api;
-    } else {
-      throw new Error('scrollzzz has beed already initialized');
-    }
+    if (isInitialized) throw new Error('scrollzzz has beed already initialized');
+    io = new IntersectionObserver(handleIntersect, {
+      rootMargin: setRootMargin()
+    });
+    elements.forEach(el => io.observe(el));
+    if (debug === true) showDebugTrigger();
+    isInitialized = true;
+    return api;
   }
 
   api.onIntersect = (f) => {
-    if (!isInitialized) throw new Error('scrollzzz need to be initialized');
+    if (!isInitialized) throw new Error('scrollzzz has not been initialized');
     if (typeof f === 'function') cb.onIntersect = f;
     else throw new Error('onIntersect requires a function');
     return api;
@@ -167,4 +157,10 @@ function isBoolean(val) {
   return typeof val === 'boolean';
 }
 
-module.exports = scrollzzz;
+function isNodejs() {
+  return typeof process !== 'undefined' &&
+    process.versions != null &&
+    process.versions.node != null;
+}
+
+if (isNodejs()) module.exports = scrollzzz;

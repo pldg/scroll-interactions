@@ -35,7 +35,11 @@ scroller
 
 ## Documentation
 
-Read jsdoc comments inside [*index.js*](index.js) and see [*index.html*](docs/index.html) example for more info.
+Read jsdoc comments inside [*index.js*](index.js) and see [*index.html*](docs/index.html) for more info.
+
+## Demo
+
+Online [demo](https://pldg.github.io/scrollzzz/) example.
 
 ## Notes
 
