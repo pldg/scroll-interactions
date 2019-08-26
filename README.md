@@ -1,5 +1,8 @@
 # scrollzzz
 
+![size-badge](https://img.shields.io/github/size/pldg/scrollzzz/index.min.js.svg)
+![downloads-badge](https://img.shields.io/npm/dt/scrollzzz.svg)
+
 Lightweight zero-dependency package which use [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to check when an element intersect a boundary line inside the viewport.
 
 ## Install
