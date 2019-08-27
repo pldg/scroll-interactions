@@ -61,7 +61,9 @@ function scrollzzz({
   }
 
   function debugTriggerClassName() {
-    return `scrollzzz-trigger--${entries}`;
+    const e = (entries[0] === '.' || entries[0] === '#') ?
+      entries.substring(1) : entries;
+    return `scrollzzz-trigger--${e}`;
   }
 
   function removeDebugTrigger() {
