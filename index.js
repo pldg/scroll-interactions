@@ -12,9 +12,9 @@
  * @returns {Object} Returns this chainable methods:
  *
  * - `init()` start to observe elements
- * - `onIntersect({ direction, entry })` handle element intersection
- * - `disconnect()` remove IntersectionObserver
+ * - `onIntersect({ direction, entry, observer })` handle element intersection
  * - `setTrigger(t)` set a new trigger position
+ * - `disconnect()` remove IntersectionObserver
  */
 function scrollzzz({
   entries,
@@ -24,11 +24,9 @@ function scrollzzz({
   if (!isNonEmptyString) {
     throw new Error('entries must be a valid DOM selector');
   }
-
   if (!isNumber(trigger) || (trigger > 1 || trigger < 0)) {
     throw new Error('trigger must be a number in 0..1 range');
   }
-
   if (!isBoolean(debug)) {
     throw new Error('debug must be boolean');
   }
@@ -88,12 +86,13 @@ function scrollzzz({
     return `-${margin}% 0% -${100 - margin}% 0%`;
   }
 
-  function handleIntersect(entries) {
+  function handleIntersect(entries, observer) {
     entries.forEach(entry => {
       if (cb.hasOwnProperty('onIntersect')) {
         cb.onIntersect({
           direction: getScrollDirection(),
-          entry
+          entry,
+          observer
         });
       }
     });
@@ -101,14 +100,23 @@ function scrollzzz({
 
   function scrollDirection() {
     let previousY = 0;
+    let previousD = 'down';
     return function getScrollDirection() {
       const y = window.pageYOffset;
-      let d = 'down';
-      if (y >= previousY) d = 'down';
-      else if (y < previousY) d = 'up';
-      previousY = window.pageYOffset;
+      let d = previousD;
+      if (y > previousY || (y === previousY && previousD === 'down')) {
+        d = 'down';
+      } else if (y < previousY || (y === previousY && previousD === 'up')) {
+        d = 'up';
+      }
+      previousY = y;
+      previousD = d;
       return d;
     };
+  }
+
+  function errorNotInitialized() {
+    throw new Error('scrollzzz has not been initialized');
   }
 
   api.init = () => {
@@ -123,14 +131,14 @@ function scrollzzz({
   }
 
   api.onIntersect = (f) => {
-    if (!isInitialized) throw new Error('scrollzzz has not been initialized');
+    if (!isInitialized) errorNotInitialized();
     if (typeof f === 'function') cb.onIntersect = f;
     else throw new Error('onIntersect requires a function');
     return api;
   }
 
   api.disconnect = () => {
-    if (!isInitialized) throw new Error('scrollzzz has not been initialized');
+    if (!isInitialized) errorNotInitialized();
     io.disconnect();
     isInitialized = false;
     return api;

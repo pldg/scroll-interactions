@@ -32,12 +32,12 @@
 
     .box1 {
       width: 300px;
-      height: 40vh;
+      height: 300px;
     }
 
     .box2 {
-      width: 300px;
-      height: 80vh;
+      width: 40vw;
+      height: 70vh;
     }
   </style>
 </head>
@@ -62,13 +62,35 @@
       trigger: 0.7,
       debug: true
     });
+    let firstLoad = true;
 
     scroller
       .init()
-      .onIntersect(({ direction, entry }) => {
+      .onIntersect(({ direction, entry, observer }) => {
         const isIntersecting = entry.isIntersecting;
         const target = entry.target;
-        console.log(direction, target.classList[1], isIntersecting);
+        const box = target.classList[1];
+        const triggerPosition = entry.rootBounds.top;
+        const isBelow = entry.boundingClientRect.top > triggerPosition;
+        let position;
+        if (isIntersecting) position = 'isIntersecting';
+        else if (!isIntersecting && isBelow) position = 'isBelow';
+        else if (!isIntersecting && !isBelow) position = 'isAbove';
+        if (firstLoad) {
+          // You can use `observer.unobserve(target)` if needed, for example for
+          // lazy load images
+          console.log(observer);
+          firstLoad = false;
+        }
+        console.log(
+          'onIntersect =>',
+          // Target element
+          `target:${box}`,
+          // Scroll direction
+          `direction:${direction}`,
+          // Element position relative to the trigger
+          `position:${position}`
+        );
         info_elem.textContent =
           `direction: ${direction}, ` +
           `isIntersecting: ${isIntersecting}`;

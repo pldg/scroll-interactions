@@ -28,8 +28,8 @@ const scroller = scrollzzz({
 
 scroller
   .init()
-  .onIntersect(({ direction, entry }) => {
-    console.log(direction, entry);
+  .onIntersect(({ direction, entry, observer }) => {
+    console.log(direction, entry, observer);
   });
 ```
 
