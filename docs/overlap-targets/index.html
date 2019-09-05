@@ -5,16 +5,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Basic Example</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css" />
+  <title>Scrollzzz | Overlap Targets</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="../main.css" />
   <style>
+    .box-container {
+      position: relative;
+      background-color: aqua;
+    }
+
     .box1 {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 400px;
       height: 600px;
     }
 
     .box2 {
+      position: absolute;
+      top: 100px;
+      left: 100px;
       width: 400px;
       height: 800px;
     }
@@ -44,13 +56,13 @@
     <h1>Scrollzzz</h1>
     <ul>
       <li>Examples:</li>
-      <li><a href="./">Basic</a></li>
-      <li><a href="./overlap-targets/">Overlap Targets</a></li>
-      <li><a href="./change-root/">Change Root</a></li>
+      <li><a href="../">Basic</a></li>
+      <li><a href="./">Overlap Targets</a></li>
+      <li><a href="../change-root/">Change Root</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/index.html">Basic</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/overlap-targets/index.html">Overlap Targets</a></h2>
     <p>Open console for more information</p>
   </div>
   <div class="box-container">
@@ -62,11 +74,12 @@
     <button class="disconnect">Disconnect</button>
     <p class="display"></p>
   </div>
-  <script src="index.js"></script>
+  <script src="../index.js"></script>
   <script>
     const disconnect_elem = document.querySelector('.disconnect');
     const trigger_elem = document.querySelector('.trigger');
     const display_elem = document.querySelector('.display');
+    const container_elem = document.querySelector('.box-container');
     const scroller = scrollzzz({
       entries: '.entry',
       trigger: 0.5,

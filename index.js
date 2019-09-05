@@ -1,4 +1,10 @@
 /**
+ * @license MIT
+ * @author Luca Poldelmengo
+ * @see {@link https://github.com/pldg/scrollzzz}
+ */
+
+/**
  * Use
  * [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
  * to check when an element intersect a boundary line inside the viewport.
@@ -7,18 +13,21 @@
  * @param {String} options.entries DOM selector for IntersectionObserver entries
  * @param {Number} [options.trigger=1] Position of the trigger (boundary line)
  * relative to viewport top, range 0..1 where 0 is top and 1 is bottom
+ * @param {Boolean} [options.root=null] Set IntersectionObserver root, the
+ * element that is used as the viewport for checking visibility of the target
  * @param {Boolean} [options.debug=false] Show trigger
  *
  * @returns {Object} Returns this chainable methods:
  *
  * - `init()` start to observe elements
  * - `onIntersect({ direction, entry, observer })` handle element intersection
- * - `setTrigger(t)` set a new trigger position
- * - `disconnect()` remove IntersectionObserver
+ * - `disconnect()` remove observer
+ * - `update(options)` re-init scrollzzz, you can pass the same initial options
  */
 function scrollzzz({
   entries,
   trigger = 1,
+  root = null,
   debug = false
 }) {
   if (!isNonEmptyString) {
@@ -41,13 +50,22 @@ function scrollzzz({
   function showDebugTrigger() {
     const el = document.createElement('div');
     const text = document.createElement('p');
-    el.style.position = 'fixed';
-    el.style.top = '0';
-    el.style.width = '100%';
     el.style.height = '0px';
     el.style.borderTop = '2px dashed grey';
     el.style.zIndex = '9999';
-    el.style.marginTop = `${trigger * 100}vh`;
+    if (root === null) {
+      el.style.position = 'fixed';
+      el.style.width = '100%';
+      el.style.top = `${trigger * 100}vh`;
+    } else {
+      const {
+        height: rootHeight,
+        width: rootWidth
+      } = root.getBoundingClientRect();
+      el.style.position = 'absolute';
+      el.style.top = `${(trigger * rootHeight) + getCoords(root).top}px`;
+      el.style.width = `${rootWidth}px`;
+    }
     text.style.fontFamily = 'monospace';
     text.style.color = 'grey';
     text.style.margin = '0';
@@ -102,7 +120,7 @@ function scrollzzz({
     let previousY = 0;
     let previousD = 'down';
     return function getScrollDirection() {
-      const y = window.pageYOffset;
+      const y = root ? root.scrollTop : window.pageYOffset;
       let d = previousD;
       if (y > previousY || (y === previousY && previousD === 'down')) {
         d = 'down';
@@ -122,7 +140,8 @@ function scrollzzz({
   api.init = () => {
     if (isInitialized) throw new Error('scrollzzz has beed already initialized');
     io = new IntersectionObserver(handleIntersect, {
-      rootMargin: setRootMargin()
+      rootMargin: setRootMargin(),
+      root
     });
     elements.forEach(el => io.observe(el));
     if (debug === true) showDebugTrigger();
@@ -130,25 +149,28 @@ function scrollzzz({
     return api;
   }
 
-  api.onIntersect = (f) => {
-    if (!isInitialized) errorNotInitialized();
-    if (typeof f === 'function') cb.onIntersect = f;
-    else throw new Error('onIntersect requires a function');
-    return api;
-  }
-
   api.disconnect = () => {
     if (!isInitialized) errorNotInitialized();
     io.disconnect();
+    if (debug === true) removeDebugTrigger();
     isInitialized = false;
     return api;
   }
 
-  api.setTrigger = (t = 1) => {
+  api.update = (options = {}) => {
     api.disconnect();
-    trigger = t;
-    if (debug === true) removeDebugTrigger();
+    entries = options.entries || entries;
+    trigger = options.trigger || trigger;
+    root = options.root || root;
+    debug = options.debug || debug;
     api.init();
+    return api;
+  }
+
+  api.onIntersect = (f) => {
+    if (!isInitialized) errorNotInitialized();
+    if (typeof f === 'function') cb.onIntersect = f;
+    else throw new Error('onIntersect requires a function');
     return api;
   }
 
@@ -165,6 +187,36 @@ function isNonEmptyString(val) {
 
 function isBoolean(val) {
   return typeof val === 'boolean';
+}
+
+/**
+ * Find element position relative to document
+ * @param {Object} element DOM element
+ * @returns {Object} `{ top, left, height, width, bottom, right }`
+ */
+function getCoords(element) {
+  const scrollTop = window.pageYOffset;
+  const scrollLeft = window.pageXOffset;
+  const clientTop = document.body.clientTop || 0;
+  const clientLeft = document.body.clientLeft || 0;
+  let {
+    top,
+    left,
+    height,
+    width
+  } = element.getBoundingClientRect();
+
+  top = top + scrollTop - clientTop;
+  left = left + scrollLeft - clientLeft;
+
+  return {
+    top,
+    left,
+    height,
+    width,
+    bottom: top + height,
+    right: left + width,
+  };
 }
 
 function isNodejs() {

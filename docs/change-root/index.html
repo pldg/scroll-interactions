@@ -5,22 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Basic Example</title>
+  <title>Scrollzzz | Change Root</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="../main.css" />
   <style>
+    .box-container {
+      background-color: lightgrey;
+      overflow-y: scroll;
+      margin: 50vh 0;
+      width: 70vw;
+      height: 70vh;
+    }
+
     .box1 {
-      width: 400px;
-      height: 600px;
+      width: 40%;
+      height: 60%;
     }
 
     .box2 {
-      width: 400px;
-      height: 800px;
+      width: 40%;
+      height: 90%;
     }
 
     .entry {
-      margin: 50vh 0 60vh 0;
+      margin: 60vh 0;
       background-color: darkgrey;
       border: 2px solid brown;
     }
@@ -44,13 +52,13 @@
     <h1>Scrollzzz</h1>
     <ul>
       <li>Examples:</li>
-      <li><a href="./">Basic</a></li>
-      <li><a href="./overlap-targets/">Overlap Targets</a></li>
-      <li><a href="./change-root/">Change Root</a></li>
+      <li><a href="../">Basic</a></li>
+      <li><a href="../overlap-targets/">Overlap Targets</a></li>
+      <li><a href="./">Change Root</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/index.html">Basic</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/change-root/index.html">Change Root</a></h2>
     <p>Open console for more information</p>
   </div>
   <div class="box-container">
@@ -62,12 +70,14 @@
     <button class="disconnect">Disconnect</button>
     <p class="display"></p>
   </div>
-  <script src="index.js"></script>
+  <script src="../index.js"></script>
   <script>
     const disconnect_elem = document.querySelector('.disconnect');
     const trigger_elem = document.querySelector('.trigger');
     const display_elem = document.querySelector('.display');
+    const container_elem = document.querySelector('.box-container');
     const scroller = scrollzzz({
+      root: container_elem,
       entries: '.entry',
       trigger: 0.5,
       debug: true
@@ -112,6 +122,17 @@
 
     trigger_elem.addEventListener('click', () => {
       scroller.update({ trigger: 0.7 });
+    });
+
+    // Re-init scrollzzz on "resize" or "orientationchange". This problem is
+    // related to `root` option, if you don't use `root` you don't need this
+    // fix. This bug seems directly correlated to IntersectionObserver native
+    // api.
+    window.addEventListener('resize', () => {
+      scroller.update();
+    });
+    window.addEventListener('orientationchange', () => {
+      scroller.update();
     });
   </script>
 </body>

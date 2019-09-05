@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  color: #3b3b3b;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e0e0e0;
+  height: 80px;
+}
+
+a {
+  color: inherit;
+}
+
+a:active {
+  color: darkblue;
+}
+
+h1 {
+  margin-left: 40px;
+  font-size: inherit;
+}
+
+ul {
+  list-style-type: none;
+  display: flex;
+  margin-right: 80px;
+}
+
+li {
+  margin-right: 1rem;
+}
+
+.subtitle {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: inherit;
+}
+
+.subtitle > p {
+  margin-top: 1rem;
+  color: #8a8a8a;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+button {
+  display: inline-block;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  text-align: center;
+  color: white;
+  background-color: grey;
+  padding: 0.5rem 1rem;
+}
+
+button:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+button:active {
+  background-color: darkblue;
+}
+
+.display {
+  margin-top: 1rem;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0%, 100% {
+    transform: rotate(0);
+  }
+
+  20%, 60% {
+    transform: rotate(-25deg);
+  }
+
+  40%, 80% {
+    transform: rotate(10deg);
+  }
+}
