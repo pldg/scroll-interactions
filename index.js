@@ -11,8 +11,10 @@
  *
  * @param {Object} options
  * @param {String} options.entries DOM selector for IntersectionObserver entries
- * @param {Number} [options.trigger=1] Position of the trigger (boundary line)
- * relative to viewport top, range 0..1 where 0 is top and 1 is bottom
+ * @param {Number} [options.trigger=1] Position of the trigger relative to
+ * viewport top, range 0..1 where 0 is top and 1 is bottom
+ * @param {Boolean} [options.once=false] Set to `true` to unobserve target after
+ * its first intersection
  * @param {Boolean} [options.root=null] Set IntersectionObserver root, the
  * element that is used as the viewport for checking visibility of the target
  * @param {Boolean} [options.debug=false] Show trigger
@@ -20,13 +22,16 @@
  * @returns {Object} Returns this chainable methods:
  *
  * - `init()` start to observe elements
- * - `onIntersect({ direction, entry, observer })` handle element intersection
+ * - `onIntersect({ direction, entry })` handle element intersection
+ * - `onScroll({ direction, entry, progress })` where `progress` is the percent
+ *   of completion relative to the trigger top position
  * - `disconnect()` remove observer
  * - `update(options)` re-init scrollzzz, you can pass the same initial options
  */
 function scrollzzz({
   entries,
   trigger = 1,
+  once = false,
   root = null,
   debug = false
 }) {
@@ -46,6 +51,10 @@ function scrollzzz({
   const api = {};
   let isInitialized = false;
   let io;
+
+  // onScroll variables
+  let v = {};
+  let isFirstLoad = true;
 
   function showDebugTrigger() {
     const el = document.createElement('div');
@@ -105,15 +114,30 @@ function scrollzzz({
   }
 
   function handleIntersect(entries, observer) {
+    v.triggerPosition = entries[0].rootBounds.top;
     entries.forEach(entry => {
+      const isIntersecting = entry.isIntersecting;
       if (cb.hasOwnProperty('onIntersect')) {
         cb.onIntersect({
           direction: getScrollDirection(),
-          entry,
-          observer
+          entry
         });
+        if (once && isIntersecting) observer.unobserve(entry.target);
+      }
+      if (!once && cb.hasOwnProperty('onScroll')) {
+        const { passive } = v;
+        if (isIntersecting) {
+          v.entry = entry;
+          v.targetHeight = entry.target.getBoundingClientRect().height;
+          window.addEventListener('scroll', handleScrolling, passive);
+        } else if (!isIntersecting && !isFirstLoad) {
+          // Use `!isFirstLoad` to prevent the listener to be immediately
+          // removed if the page is loaded where target is already intersecting
+          window.removeEventListener('scroll', handleScrolling, passive);
+        }
       }
     });
+    if (isFirstLoad) isFirstLoad = false;
   }
 
   function scrollDirection() {
@@ -131,6 +155,27 @@ function scrollzzz({
       previousD = d;
       return d;
     };
+  }
+
+  function handleScrolling(evt) {
+    cb.onScroll({
+      direction: getScrollDirection(),
+      entry: v.entry,
+      progress: getProgress(),
+    });
+  }
+
+  function getProgress() {
+    const {
+      entry,
+      targetHeight,
+      triggerPosition
+    } = v;
+    const { top: targetTop } = entry.target.getBoundingClientRect();
+    const progress = 1 / (targetHeight / (triggerPosition - targetTop));
+    if (progress < 0) return 0;
+    else if (progress > 1) return 1;
+    else return parseFloat(progress.toFixed(4));
   }
 
   function errorNotInitialized() {
@@ -171,6 +216,14 @@ function scrollzzz({
     if (!isInitialized) errorNotInitialized();
     if (typeof f === 'function') cb.onIntersect = f;
     else throw new Error('onIntersect requires a function');
+    return api;
+  }
+
+  api.onScroll = (f) => {
+    if (!isInitialized) errorNotInitialized();
+    if (typeof f === 'function') cb.onScroll = f;
+    else throw new Error('onScroll requires a function');
+    v.passive = addPassiveIfSupported();
     return api;
   }
 
@@ -217,6 +270,28 @@ function getCoords(element) {
     bottom: top + height,
     right: left + width,
   };
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+function addPassiveIfSupported() {
+  let passive = false;
+
+  try {
+    const options = {
+      get passive() {
+        passive = {
+          passive: true
+        };
+      }
+    };
+
+    window.addEventListener('test', null, options);
+    window.removeEventListener('test', null, options);
+  } catch (err) {
+    passive = false;
+  }
+
+  return passive;
 }
 
 function isNodejs() {

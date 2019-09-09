@@ -54,10 +54,10 @@ li {
   color: #8a8a8a;
 }
 
-.bottom {
+.buttons {
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 2rem;
+  right: 2rem;
 }
 
 button {
@@ -78,10 +78,6 @@ button:hover {
 
 button:active {
   background-color: darkblue;
-}
-
-.display {
-  margin-top: 1rem;
 }
 
 .github-corner:hover .octo-arm {

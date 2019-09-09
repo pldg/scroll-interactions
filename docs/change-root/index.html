@@ -9,12 +9,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
   <link rel="stylesheet" href="../main.css" />
   <style>
-    .box-container {
+    .boxes-container {
       background-color: lightgrey;
       overflow-y: scroll;
-      margin: 50vh 0;
-      width: 70vw;
-      height: 70vh;
+      margin: 40vh 0;
+      width: 60vw;
+      height: 60vh;
     }
 
     .box1 {
@@ -55,38 +55,35 @@
       <li><a href="../">Basic</a></li>
       <li><a href="../overlap-targets/">Overlap Targets</a></li>
       <li><a href="./">Change Root</a></li>
+      <li><a href="../">Progress</a></li>
     </ul>
   </nav>
   <div class="subtitle">
     <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/change-root/index.html">Change Root</a></h2>
     <p>Open console for more information</p>
   </div>
-  <div class="box-container">
+  <div class="boxes-container">
     <div class="entry box1">Box1</div>
     <div class="entry box2">Box2</div>
   </div>
-  <div class="bottom">
+  <div class="buttons">
     <button class="trigger">Update trigger</button>
     <button class="disconnect">Disconnect</button>
-    <p class="display"></p>
   </div>
   <script src="../index.js"></script>
   <script>
-    const disconnect_elem = document.querySelector('.disconnect');
-    const trigger_elem = document.querySelector('.trigger');
-    const display_elem = document.querySelector('.display');
-    const container_elem = document.querySelector('.box-container');
+    const disconnect_btn = document.querySelector('.disconnect');
+    const trigger_btn = document.querySelector('.trigger');
     const scroller = scrollzzz({
-      root: container_elem,
+      root: document.querySelector('.boxes-container'),
       entries: '.entry',
       trigger: 0.5,
       debug: true
     });
-    let firstLoad = true;
 
     scroller
       .init()
-      .onIntersect(({ direction, entry, observer }) => {
+      .onIntersect(({ direction, entry }) => {
         const isIntersecting = entry.isIntersecting;
         const target = entry.target;
         const box = target.classList[1];
@@ -96,12 +93,6 @@
         if (isIntersecting) position = 'isIntersecting';
         else if (!isIntersecting && isBelow) position = 'isBelow';
         else if (!isIntersecting && !isBelow) position = 'isAbove';
-        if (firstLoad) {
-          // You can use `observer.unobserve(target)` if needed, for example for
-          // lazy load images
-          console.log(observer);
-          firstLoad = false;
-        }
         console.log(
           'onIntersect =>',
           // Target element
@@ -111,16 +102,13 @@
           // Element position relative to the trigger
           `position:${position}`
         );
-        display_elem.textContent =
-          `direction: ${direction}, ` +
-          `isIntersecting: ${isIntersecting}`;
         if (isIntersecting) target.style.backgroundColor = 'burlywood';
         else target.style.backgroundColor = 'darkgrey';
       });
 
-    disconnect_elem.addEventListener('click', scroller.disconnect);
+    disconnect_btn.addEventListener('click', scroller.disconnect);
 
-    trigger_elem.addEventListener('click', () => {
+    trigger_btn.addEventListener('click', () => {
       scroller.update({ trigger: 0.7 });
     });
 

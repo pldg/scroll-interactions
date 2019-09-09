@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Basic</title>
+  <title>Scrollzzz | Progress</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
-  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="../main.css" />
   <style>
     .box1 {
       width: 400px;
@@ -44,14 +44,14 @@
     <h1>Scrollzzz</h1>
     <ul>
       <li>Examples:</li>
-      <li><a href="./">Basic</a></li>
-      <li><a href="./overlap-targets/">Overlap Targets</a></li>
-      <li><a href="./change-root/">Change Root</a></li>
-      <li><a href="./progress/">Progress</a></li>
+      <li><a href="../">Basic</a></li>
+      <li><a href="../overlap-targets/">Overlap Targets</a></li>
+      <li><a href="../change-root/">Change Root</a></li>
+      <li><a href="./">Progress</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/index.html">Basic</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/progress/index.html">Progress</a></h2>
     <p>Open console for more information</p>
   </div>
   <div class="boxes-container">
@@ -62,7 +62,7 @@
     <button class="trigger">Update trigger</button>
     <button class="disconnect">Disconnect</button>
   </div>
-  <script src="index.js"></script>
+  <script src="../index.js"></script>
   <script>
     const disconnect_btn = document.querySelector('.disconnect');
     const trigger_btn = document.querySelector('.trigger');
@@ -95,12 +95,33 @@
         );
         if (isIntersecting) target.style.backgroundColor = 'burlywood';
         else target.style.backgroundColor = 'darkgrey';
+      })
+      .onScroll(({ direction, entry, progress }) => {
+        const isIntersecting = entry.isIntersecting;
+        const target = entry.target;
+        const box = target.classList[1];
+        console.log(
+          'onScroll =>',
+          `target:${box}`,
+          `direction:${direction}`,
+          // Percent of completion relative to the trigger top position
+          `progress:${progress}`
+        );
       });
 
     disconnect_btn.addEventListener('click', scroller.disconnect);
 
     trigger_btn.addEventListener('click', () => {
       scroller.update({ trigger: 0.7 });
+    });
+
+    // Re-init scrollzzz on "resize" or "orientationchange", this will ensure
+    // targetHeight and triggerPosition are re-calculated correctly
+    window.addEventListener('resize', () => {
+      scroller.update();
+    });
+    window.addEventListener('orientationchange', () => {
+      scroller.update();
     });
   </script>
 </body>

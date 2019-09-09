@@ -5,12 +5,16 @@
 
 Lightweight zero-dependency package which use [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to check when an element intersect a boundary line inside the viewport.
 
+## Why
+
+Make it easy to create scroll-driven interactions in the browser.
+
 ## Install
 
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/pldg/scrollzzz/index.min.js"></script>
+<script src="https://unpkg.com/scrollzzz/index.min.js"></script>
 ```
 
 ### NPM
@@ -28,21 +32,31 @@ const scroller = scrollzzz({
 
 scroller
   .init()
-  .onIntersect(({ direction, entry, observer }) => {
-    console.log(direction, entry, observer);
-  });
+  .onIntersect(({ direction, entry }) => { ... })
+  .onScroll(({ direction, entry, progress }) => { ... });
 ```
 
-## Documentation
+## Examples
 
-Read jsdoc comments inside [*index.js*](index.js) and see *index.html* files inside [*docs/*](docs/) folder for more info.
+Some [examples](https://pldg.github.io/scrollzzz/) online.
 
-## Demo
+See *index.html* examples files inside [*docs*](docs/) folder.
 
-Online [demo](https://pldg.github.io/scrollzzz/) examples.
+## How it works
+
+`onIntersect()` fires only when element enter or exit the trigger line.
+
+`onScroll()` fires when element intersect the trigger: it adds a scroll event listener to keep track of `progress` (the
+percent of completion relative to the trigger top position), when the element leave the trigger the event listener is removed.
+
+## API
+
+Look at [*index.js*](index.js) file.
 
 ## Notes
 
-Inspired by [scrollama](https://github.com/russellgoldenberg/scrollama/).
+Tested in latest version of Chrome, Firefox, Edge. If you need support for older browser you can use the official [IntersectionObserver polyfill](https://github.com/w3c/IntersectionObserver/tree/master/polyfill).
 
-Tested in Chrome, Firefox, Edge; it works even if the browser is zoomed.
+It works even if the browser is zoomed.
+
+Inspired by [scrollama](https://github.com/russellgoldenberg/scrollama/).
