@@ -5,41 +5,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Overlap Targets</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <title>Scrollzzz | Overlap</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
   <link rel="stylesheet" href="../main.css" />
   <style>
-    .boxes-container {
+    .boxes {
       position: relative;
+    }
+
+    .box {
+      width: 400px;
+    }
+
+    .box:last-child {
+      margin-bottom: 80vh;
     }
 
     .box1 {
       position: absolute;
       top: 0;
       left: 0;
-      width: 400px;
       height: 600px;
     }
 
     .box2 {
       position: absolute;
-      top: 100px;
+      top: 200px;
       left: 100px;
-      width: 400px;
       height: 800px;
-    }
-
-    .entry {
-      margin: 50vh 0 60vh 0;
-      background-color: darkgrey;
-      border: 2px solid brown;
     }
   </style>
 </head>
 
 <body>
-  <a href="https://github.com/pldg/scrollzzz" class="github-corner"
-    aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250"
+  <a href="https://github.com/pldg/scrollzzz" class="github-corner" aria-label="View source on GitHub"><svg width="80"
+      height="80" viewBox="0 0 250 250"
       style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
       <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
       <path
@@ -55,62 +56,71 @@
     <ul>
       <li>Examples:</li>
       <li><a href="../">Basic</a></li>
-      <li><a href="./">Overlap Targets</a></li>
+      <li><a href="./">Overlap</a></li>
+      <li><a href="../unobserve/">Unobserve</a></li>
       <li><a href="../change-root/">Change Root</a></li>
-      <li><a href="../">Progress</a></li>
+      <li><a href="../progress/">Progress</a></li>
+      <li><a href="../progress-overlap/">Progress Overlap</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/overlap-targets/index.html">Overlap Targets</a></h2>
-    <p>Open console for more information</p>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/overlap/index.html">Overlap</a></h2>
+    <p>open console - scroll up and down - see source code</p>
   </div>
-  <div class="boxes-container">
-    <div class="entry box1">Box1</div>
-    <div class="entry box2">Box2</div>
+  <div class="boxes">
+    <div class="box box1">
+      <p>Box1</p>
+    </div>
+    <div class="box box2">
+      <p>Box2</p>
+    </div>
   </div>
   <div class="buttons">
     <button class="trigger">Update trigger</button>
     <button class="disconnect">Disconnect</button>
   </div>
-  <script src="../index.js"></script>
+
+  <!-- Polyfill for IntersectionObserver -->
+  <script
+    src="https://polyfill.io/v3/polyfill.min.js?flags=gated&features=IntersectionObserver%2CIntersectionObserverEntry"></script>
+
+  <script src="../scrollzzz.iife.js"></script>
+
   <script>
-    const disconnect_btn = document.querySelector('.disconnect');
-    const trigger_btn = document.querySelector('.trigger');
-    const scroller = scrollzzz({
-      entries: '.entry',
+    var disconnectBtn = document.querySelector('.disconnect');
+    var triggerBtn = document.querySelector('.trigger');
+    var observe_box = scrollzzz({
+      targets: '.box',
       trigger: 0.5,
       debug: true
     });
 
-    scroller
+    observe_box
       .init()
-      .onIntersect(({ direction, entry }) => {
-        const isIntersecting = entry.isIntersecting;
-        const target = entry.target;
-        const box = target.classList[1];
-        const triggerPosition = entry.rootBounds.top;
-        const isBelow = entry.boundingClientRect.top > triggerPosition;
-        let position;
-        if (isIntersecting) position = 'isIntersecting';
-        else if (!isIntersecting && isBelow) position = 'isBelow';
-        else if (!isIntersecting && !isBelow) position = 'isAbove';
+      .observe(function (res) {
+        var direction = res.direction;
+        var position = res.position;
+        var entry = res.entry;
+        var isIntersecting = entry.isIntersecting;
+        var target = entry.target;
+        var box = target.classList[1];
         console.log(
-          'onIntersect =>',
+          'observe =>',
           // Target element
-          `target:${box}`,
+          'target:' + box,
           // Scroll direction
-          `direction:${direction}`,
+          'direction:' + direction,
           // Element position relative to the trigger
-          `position:${position}`
+          'position:' + position
         );
         if (isIntersecting) target.style.backgroundColor = 'burlywood';
         else target.style.backgroundColor = 'darkgrey';
       });
 
-    disconnect_btn.addEventListener('click', scroller.disconnect);
+    disconnectBtn.addEventListener('click', observe_box.disconnect);
 
-    trigger_btn.addEventListener('click', () => {
-      scroller.update({ trigger: 0.7 });
+    triggerBtn.addEventListener('click', function () {
+      observe_box.update({ trigger: 0.3 });
     });
   </script>
 </body>

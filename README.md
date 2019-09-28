@@ -1,61 +1,78 @@
 # scrollzzz
 
-![size-badge](https://img.shields.io/github/size/pldg/scrollzzz/index.min.js.svg)
+![size-badge](https://img.shields.io/github/size/pldg/scrollzzz/dist/scrollzzz.esm.min.js)
 ![downloads-badge](https://img.shields.io/npm/dt/scrollzzz.svg)
 
-Lightweight zero-dependency package which use [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to check when an element intersect a boundary line inside the viewport.
+Lightweight, fast, zero-dependency package which use [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) to observe when an element intersect a (trigger) boundary line inside the viewport.
 
 ## Why
 
-Make it easy to create scroll-driven interactions in the browser.
+Make it easy to create scroll-driven interactions in the browser without performance overload.
+
+## Key features
+
+You have access to:
+
+- Scroll direction
+- Element position relative to the trigger
+- Percent of completion relative to the target top border
+- The original IntersectionObserver entry
+
+You can also:
+
+- Unobserve targets
+- Change IntersectionObserver.root
+- Disconnect IntersectionObserver
+
+And more.
 
 ## Install
-
-### CDN
-
-```html
-<script src="https://unpkg.com/scrollzzz/index.min.js"></script>
-```
 
 ### NPM
 
 `npm install --save scrollzzz`
 
+### CDN
+
+```html
+<script src="https://unpkg.com/scrollzzz/dist/scrollzzz.iife.min.js"></script>
+```
+
 ## Quick start
 
 ```js
-const scroller = scrollzzz({
-  entries: '.entry',
-  trigger: 0.5,
-  debug: true
+const observe_box = scrollzzz({
+  targets: '.box',
+  debug: true,
+  trigger: 0.5
 });
 
-scroller
+observe_box
   .init()
-  .onIntersect(({ direction, entry }) => { ... })
-  .onScroll(({ direction, entry, progress }) => { ... });
+  .observe(({ direction, position, entry }) => { ... });
 ```
 
 ## Examples
 
-Some [examples](https://pldg.github.io/scrollzzz/) online.
-
-See *index.html* examples files inside [*docs*](docs/) folder.
-
-## How it works
-
-`onIntersect()` fires only when element enter or exit the trigger line.
-
-`onScroll()` fires when element intersect the trigger: it adds a scroll event listener to keep track of `progress` (the
-percent of completion relative to the trigger top position), when the element leave the trigger the event listener is removed.
+See online [examples](https://pldg.github.io/scrollzzz/) and check their *index.html* source code for more info.
 
 ## API
 
-Look at [*index.js*](index.js) file.
+Go to [API](api.md) page.
+
+## How it works
+
+`observe()` works as callback handler of IntersectionObserver, it fires on page load for all elements, then it fires only when element enter or exit the trigger line.
+
+If `progress===true` and an element intersect the trigger, a scroll event listener is added to keep track of `progress`, when the element leave the trigger the event listener is removed. It make use of [passive](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners) to improve performance.
+
+When you use `unobserve` option, scrollzzz will cache all targets that has been unobserved, if scrollzzz is re-initialize it'll not observe them again (see [*docs/unobserve*](docs/unobserve/index.html) example), you can also empty the cache if needed (read [API](api.md) for reference).
+
+## Browsers support
+
+Tested in IE11 and in the latest version of Chrome, Firefox, Edge, Safari. For older browser make sure to add the official [IntersectionObserver polyfill](https://github.com/w3c/IntersectionObserver/tree/master/polyfill) just before scrollzzz.
 
 ## Notes
-
-Tested in latest version of Chrome, Firefox, Edge. If you need support for older browser you can use the official [IntersectionObserver polyfill](https://github.com/w3c/IntersectionObserver/tree/master/polyfill).
 
 It works even if the browser is zoomed.
 

@@ -5,34 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Change Root</title>
+  <title>Scrollzzz | Unobserve</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
     integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
   <link rel="stylesheet" href="../main.css" />
   <style>
-    .boxes {
-      background-color: lightgrey;
-      overflow-y: scroll;
-      margin: 40vh 0;
-      width: 60vw;
-      height: 60vh;
-    }
-
     .box {
-      width: 40%;
-    }
-
-    .box:last-child {
-      margin-bottom: 40vh;
+      width: 400px;
     }
 
     .box1 {
-      height: 60%;
-      margin-top: 40vh;
+      height: 600px;
+      margin-top: 35vh;
     }
 
     .box2 {
-      height: 90%;
+      height: 800px;
       margin-top: 30vh;
     }
   </style>
@@ -57,14 +45,14 @@
       <li>Examples:</li>
       <li><a href="../">Basic</a></li>
       <li><a href="../overlap/">Overlap</a></li>
-      <li><a href="../unobserve/">Unobserve</a></li>
-      <li><a href="./">Change Root</a></li>
+      <li><a href="./">Unobserve</a></li>
+      <li><a href="../change-root/">Change Root</a></li>
       <li><a href="../progress/">Progress</a></li>
       <li><a href="../progress-overlap/">Progress Overlap</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/change-root/index.html">Change Root</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/unobserve/index.html">Unobserve</a></h2>
     <p>open console - scroll up and down - see source code</p>
   </div>
   <div class="boxes">
@@ -77,7 +65,7 @@
   </div>
   <div class="buttons">
     <button class="trigger">Update trigger</button>
-    <button class="disconnect">Disconnect</button>
+    <button class="add-box">Append new box</button>
   </div>
 
   <!-- Polyfill for IntersectionObserver -->
@@ -87,12 +75,12 @@
   <script src="../scrollzzz.iife.js"></script>
 
   <script>
-    var disconnectBtn = document.querySelector('.disconnect');
     var triggerBtn = document.querySelector('.trigger');
-    var observe_box= scrollzzz({
+    var addBoxBtn = document.querySelector('.add-box');
+    var observe_box = scrollzzz({
       targets: '.box',
-      root: '.boxes',
       trigger: 0.5,
+      unobserve: 'intersect',
       debug: true
     });
 
@@ -114,24 +102,34 @@
           // Element position relative to the trigger
           'position:' + position
         );
-        if (isIntersecting) target.style.backgroundColor = 'burlywood';
-        else target.style.backgroundColor = 'darkgrey';
+        if (isIntersecting) {
+          target.style.backgroundColor = 'burlywood';
+          console.log('unobserve target:' + box);
+        } else {
+          target.style.backgroundColor = 'darkgrey';
+        }
       });
-
-    disconnectBtn.addEventListener('click', observe_box.disconnect);
 
     triggerBtn.addEventListener('click', function () {
       observe_box.update({ trigger: 0.3 });
     });
 
-    // Re-init scrollzzz on "resize" or "orientationchange". This problem is
-    // related to `root` option, if you don't use `root` you don't need this
-    // fix. This bug seems directly correlated to IntersectionObserver native
-    // api.
-    window.addEventListener('resize', function () {
-      observe_box.update();
-    });
-    window.addEventListener('orientationchange', function () {
+    addBoxBtn.addEventListener('click', function () {
+      var boxes = document.querySelector('.boxes');
+      var box = document.createElement('div');
+      var p = document.createElement('p');
+      box.style.height = '900px';
+      box.style.width = '400px';
+      box.style.marginTop = '30vh';
+      box.setAttribute('class', 'box box3');
+      boxes.appendChild(box);
+      p.textContent = 'Box3';
+      box.appendChild(p);
+      // Re-init observe_box on DOM changes
+      //
+      // Note: you can also use `update({}, true)` if you want to empty the
+      // cache, doing so will let scrollzzz re-observe also the targets that has
+      // been previously unobserved (read API for more info)
       observe_box.update();
     });
   </script>

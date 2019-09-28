@@ -24,6 +24,10 @@ a {
   color: inherit;
 }
 
+a:hover {
+  opacity: 0.7;
+}
+
 a:active {
   color: darkblue;
 }
@@ -52,6 +56,21 @@ li {
 .subtitle > p {
   margin-top: 1rem;
   color: #8a8a8a;
+}
+
+.boxes {
+  margin-top: 35vh;
+  margin-bottom: 80vh;
+}
+
+.box {
+  margin-left: 2rem;
+  text-align: center;
+  border: 1px solid grey;
+}
+
+.box p {
+  margin: 1rem;
 }
 
 .buttons {

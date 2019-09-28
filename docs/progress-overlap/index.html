@@ -5,35 +5,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Change Root</title>
+  <title>Scrollzzz | Progress Overlap</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
     integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
   <link rel="stylesheet" href="../main.css" />
   <style>
     .boxes {
-      background-color: lightgrey;
-      overflow-y: scroll;
-      margin: 40vh 0;
-      width: 60vw;
-      height: 60vh;
+      position: relative;
     }
 
     .box {
-      width: 40%;
+      width: 400px;
     }
 
     .box:last-child {
-      margin-bottom: 40vh;
+      margin-bottom: 80vh;
     }
 
     .box1 {
-      height: 60%;
-      margin-top: 40vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 600px;
     }
 
     .box2 {
-      height: 90%;
-      margin-top: 30vh;
+      position: absolute;
+      top: 200px;
+      left: 100px;
+      height: 800px;
     }
   </style>
 </head>
@@ -58,21 +58,24 @@
       <li><a href="../">Basic</a></li>
       <li><a href="../overlap/">Overlap</a></li>
       <li><a href="../unobserve/">Unobserve</a></li>
-      <li><a href="./">Change Root</a></li>
+      <li><a href="../change-root/">Change Root</a></li>
       <li><a href="../progress/">Progress</a></li>
-      <li><a href="../progress-overlap/">Progress Overlap</a></li>
+      <li><a href="./">Progress Overlap</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/change-root/index.html">Change Root</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/progress-overlap/index.html">Progress Overlap</a>
+    </h2>
     <p>open console - scroll up and down - see source code</p>
   </div>
   <div class="boxes">
     <div class="box box1">
       <p>Box1</p>
+      <p class="progress">0%</p>
     </div>
     <div class="box box2">
       <p>Box2</p>
+      <p class="progress">0%</p>
     </div>
   </div>
   <div class="buttons">
@@ -89,10 +92,11 @@
   <script>
     var disconnectBtn = document.querySelector('.disconnect');
     var triggerBtn = document.querySelector('.trigger');
-    var observe_box= scrollzzz({
+    var observe_box = scrollzzz({
       targets: '.box',
-      root: '.boxes',
       trigger: 0.5,
+      progress: true,
+      throttle: 100,
       debug: true
     });
 
@@ -101,6 +105,7 @@
       .observe(function (res) {
         var direction = res.direction;
         var position = res.position;
+        var progress = res.progress;
         var entry = res.entry;
         var isIntersecting = entry.isIntersecting;
         var target = entry.target;
@@ -112,10 +117,12 @@
           // Scroll direction
           'direction:' + direction,
           // Element position relative to the trigger
-          'position:' + position
+          'position:' + position,
+          // Percent of completion relative to the target top border
+          'progress:' + progress
         );
-        if (isIntersecting) target.style.backgroundColor = 'burlywood';
-        else target.style.backgroundColor = 'darkgrey';
+        target.style.backgroundColor = 'rgba(169, 169, 169, ' + progress + ')';
+        target.querySelector('.progress').textContent = progress.toFixed(2) + '%';
       });
 
     disconnectBtn.addEventListener('click', observe_box.disconnect);
@@ -124,10 +131,9 @@
       observe_box.update({ trigger: 0.3 });
     });
 
-    // Re-init scrollzzz on "resize" or "orientationchange". This problem is
-    // related to `root` option, if you don't use `root` you don't need this
-    // fix. This bug seems directly correlated to IntersectionObserver native
-    // api.
+    // When using `progress` you must re-init scrollzzz on "resize" and
+    // "orientationchange", this will ensure targetHeight and triggerPosition
+    // are re-calculated correctly
     window.addEventListener('resize', function () {
       observe_box.update();
     });
