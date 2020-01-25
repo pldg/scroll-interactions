@@ -4,8 +4,11 @@
  * @see {@link https://github.com/pldg/scrollzzz}
  */
 
-var scrollzzz = (function () {
-  'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.scrollzzz = factory());
+}(this, function () { 'use strict';
 
   // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
   function addPassiveIfSupported() {
@@ -402,4 +405,4 @@ var scrollzzz = (function () {
 
   return scrollzzz;
 
-}());
+}));

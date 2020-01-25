@@ -31,7 +31,7 @@ Position of the trigger relative to [root](#optionsroot) top, range `0..1`, wher
 *Required* <br>
 *Type:* `String`
 
-[Unobserve targets](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/unobserve) based on their position relative to the trigger, can have three value: `"below"`, `"intersect"` (only works if `progress===false`), `"above"`.
+[Unobserve targets](https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver/unobserve) on page load using `"onLoad"` or based on their position relative to the trigger using `"below"`, `"intersect"` (only works if `progress===false`), `"above"`.
 
 ### `options.progress`
 

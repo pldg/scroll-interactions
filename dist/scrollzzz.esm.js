@@ -78,9 +78,9 @@ function isNonEmptyString(val) {
  * @param {String} options.targets DOM elements selector
  * @param {Number} [options.trigger=1] Position of the trigger relative to root
  * top, range 0..1, where 0 is top and 1 is bottom
- * @param {String} [options.unobserve] Unobserve targets based on their position
- * relative to the trigger, can have three value: `"below"`, `"intersect"` (only
- * works if progress===false), `"above"`
+ * @param {String} [options.unobserve] Unobserve targets on page load using
+ * `"onLoad"` or based on their position relative to the trigger using
+ * `"below"`, `"intersect"` (only works if progress===false), `"above"`
  * @param {Boolean} [options.progress=false] Add `progress` to `observe()`
  * method
  * @param {Number} [options.throttle] Add throttle in millisecond to scroll
@@ -125,7 +125,7 @@ function scrollzzz({
   let io;
   let observe;
 
-  // Variables used for `progress`
+  // Variables used for `progress`:
 
   const passive = progress ? addPassiveIfSupported() : false;
   const scrollEvents = [];
@@ -292,10 +292,11 @@ function scrollzzz({
   }
 
   function unobserveTarget(position, target, observer) {
+    const onLoad = unobserve === 'onLoad';
     const below = unobserve === 'below' && position === 'below';
     const intersect = unobserve === 'intersect' && position === 'intersect';
     const above = unobserve === 'above' && position === 'above';
-    if (below || intersect || above) observer.unobserve(target);
+    if (onLoad || below || intersect || above) observer.unobserve(target);
   }
 
   function checkOptionsErrors() {
@@ -306,9 +307,11 @@ function scrollzzz({
     }
 
     if (unobserve) {
-      const c = ['below', 'intersect', 'above'].indexOf(unobserve) > -1;
+      const c = ['onLoad', 'below', 'intersect', 'above'].indexOf(unobserve) > -1;
       if (!c) {
-        throw new Error('unobserve must be "below" or "intersect" or "above"');
+        throw new Error(
+          'unobserve must be "onLoad" or "below" or "intersect" or "above"'
+        );
       } else if (progress && unobserve === 'intersecting') {
         throw new Error('if using progress, unobserve can not be "intersect"');
       }
@@ -342,10 +345,12 @@ function scrollzzz({
       root: rootElem || null
     });
     [].slice.call(document.querySelectorAll(targets)).forEach((el, i) => {
-      // Use set attribute to:
-      // - track targets for scroll events
-      // - cache unobserved targets
-      el.setAttribute('data-scrollzzz', i);
+      if (!el.hasAttribute('data-scrollzzz')) {
+        // Use set attribute to:
+        // - track targets for scroll events
+        // - cache unobserved targets
+        el.setAttribute('data-scrollzzz', i);
+      }
       if (unobservedTargets.indexOf(i) === -1) io.observe(el);
     });
     isInitialized = true;

@@ -5,34 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Scrollzzz | Change Root</title>
+  <title>Scrollzzz | Multiple Triggers</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
     integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
   <link rel="stylesheet" href="../main.css" />
   <style>
-    .boxes {
-      background-color: lightgrey;
-      overflow-y: scroll;
-      margin: 40vh 0;
-      width: 60vw;
-      height: 60vh;
-    }
-
     .box {
-      width: 40%;
-    }
-
-    .box:last-child {
-      margin-bottom: 40vh;
+      width: 400px;
     }
 
     .box1 {
-      height: 60%;
-      margin-top: 40vh;
+      height: 600px;
+      margin-top: 35vh;
     }
 
     .box2 {
-      height: 90%;
+      height: 800px;
       margin-top: 30vh;
     }
   </style>
@@ -58,14 +46,15 @@
       <li><a href="../">Basic</a></li>
       <li><a href="../overlap/">Overlap</a></li>
       <li><a href="../unobserve/">Unobserve</a></li>
-      <li><a href="./">Change Root</a></li>
+      <li><a href="../change-root/">Change Root</a></li>
       <li><a href="../progress/">Progress</a></li>
       <li><a href="../progress-overlap/">Progress Overlap</a></li>
-      <li><a href="../multiple-triggers/">Multiple Triggers</a></li>
+      <li><a href="./">Multiple Triggers</a></li>
     </ul>
   </nav>
   <div class="subtitle">
-    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/change-root/index.html">Change Root</a></h2>
+    <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/multiple-triggers/index.html">Multiple Triggers</a>
+    </h2>
     <p>open console - scroll up and down - inspect source code</p>
   </div>
   <div class="boxes">
@@ -78,7 +67,7 @@
   </div>
   <div class="buttons">
     <button class="trigger">Update trigger</button>
-    <button class="disconnect">Disconnect</button>
+    <button class="add-box">Append new box</button>
   </div>
 
   <!-- Polyfill for IntersectionObserver -->
@@ -88,16 +77,20 @@
   <script src="../scrollzzz.iife.js"></script>
 
   <script>
-    var disconnectBtn = document.querySelector('.disconnect');
     var triggerBtn = document.querySelector('.trigger');
-    var observe_box= scrollzzz({
+    var addBoxBtn = document.querySelector('.add-box');
+    var observe_1 = scrollzzz({
       targets: '.box',
-      root: '.boxes',
-      trigger: 0.5,
+      trigger: 0.1,
+      debug: true
+    });
+    var observe_2 = scrollzzz({
+      targets: '.box',
+      trigger: 0.9,
       debug: true
     });
 
-    observe_box
+    observe_1
       .init()
       .observe(function (res) {
         var direction = res.direction;
@@ -107,7 +100,7 @@
         var target = entry.target;
         var box = target.classList[1];
         console.log(
-          'observe =>',
+          'observe_1(trigger=0.1) =>',
           // Target element
           'target:' + box,
           // Scroll direction
@@ -115,26 +108,70 @@
           // Element position relative to the trigger
           'position:' + position
         );
-        if (isIntersecting) target.style.backgroundColor = 'burlywood';
-        else target.style.backgroundColor = 'darkgrey';
+        if (isIntersecting) {
+          target.style.backgroundColor = 'burlywood';
+        } else {
+          target.style.backgroundColor = 'darkgrey';
+        }
       });
 
-    disconnectBtn.addEventListener('click', observe_box.disconnect);
+    observe_2
+      .init()
+      .observe(function (res) {
+        var direction = res.direction;
+        var position = res.position;
+        var entry = res.entry;
+        var isIntersecting = entry.isIntersecting;
+        var target = entry.target;
+        var box = target.classList[1];
+        console.log(
+          'observe_2(trigger=0.9) =>',
+          // Target element
+          'target:' + box,
+          // Scroll direction
+          'direction:' + direction,
+          // Element position relative to the trigger
+          'position:' + position
+        );
+        if (isIntersecting) {
+          target.style.boxShadow = "10px 10px 10px blue";
+        } else {
+          target.style.boxShadow = "10px 10px 10px red";
+        }
+      });
 
     triggerBtn.addEventListener('click', function () {
-      observe_box.update({ trigger: 0.3 });
+      observe_1.update({ trigger: 0.8 });
+      observe_2.update({ trigger: 0.2 });
     });
 
-    // Re-init scrollzzz on "resize" or "orientationchange". This problem is
-    // related to `root` option, if you don't use `root` you don't need this
-    // fix. This bug inspectms directly correlated to IntersectionObserver native
-    // api.
-    window.addEventListener('resize', function () {
-      observe_box.update();
+    addBoxBtn.addEventListener('click', function () {
+      createBox();
+      // Re-init observe_box on DOM changes
+      //
+      // Note: you can also use `update({}, true)` if you want to empty the
+      // cache, doing so will let scrollzzz re-observe also the targets that has
+      // been previously unobserved (read API for more info)
+      observe_1.update();
+      observe_2.update();
     });
-    window.addEventListener('orientationchange', function () {
-      observe_box.update();
-    });
+
+    var boxNumber = 3;
+
+    function createBox() {
+      var boxes = document.querySelector('.boxes');
+      var box = document.createElement('div');
+      var p = document.createElement('p');
+      var boxName = 'box' + boxNumber;
+      box.style.height = '900px';
+      box.style.width = '400px';
+      box.style.marginTop = '30vh';
+      box.setAttribute('class', 'box ' + boxName);
+      boxes.appendChild(box);
+      p.textContent = boxName;
+      box.appendChild(p);
+      boxNumber += 1;
+    }
   </script>
 </body>
 

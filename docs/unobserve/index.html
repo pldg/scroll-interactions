@@ -49,18 +49,19 @@
       <li><a href="../change-root/">Change Root</a></li>
       <li><a href="../progress/">Progress</a></li>
       <li><a href="../progress-overlap/">Progress Overlap</a></li>
+      <li><a href="../multiple-triggers/">Multiple Triggers</a></li>
     </ul>
   </nav>
   <div class="subtitle">
     <h2><a href="https://github.com/pldg/scrollzzz/tree/master/docs/unobserve/index.html">Unobserve</a></h2>
-    <p>open console - scroll up and down - see source code</p>
+    <p>open console - scroll up and down - inspect source code</p>
   </div>
   <div class="boxes">
     <div class="box box1">
-      <p>Box1</p>
+      <p>box1</p>
     </div>
     <div class="box box2">
-      <p>Box2</p>
+      <p>box2</p>
     </div>
   </div>
   <div class="buttons">
@@ -115,16 +116,7 @@
     });
 
     addBoxBtn.addEventListener('click', function () {
-      var boxes = document.querySelector('.boxes');
-      var box = document.createElement('div');
-      var p = document.createElement('p');
-      box.style.height = '900px';
-      box.style.width = '400px';
-      box.style.marginTop = '30vh';
-      box.setAttribute('class', 'box box3');
-      boxes.appendChild(box);
-      p.textContent = 'Box3';
-      box.appendChild(p);
+      createBox();
       // Re-init observe_box on DOM changes
       //
       // Note: you can also use `update({}, true)` if you want to empty the
@@ -132,6 +124,23 @@
       // been previously unobserved (read API for more info)
       observe_box.update();
     });
+
+    var boxNumber = 3;
+
+    function createBox() {
+      var boxes = document.querySelector('.boxes');
+      var box = document.createElement('div');
+      var p = document.createElement('p');
+      var boxName = 'box' + boxNumber;
+      box.style.height = '900px';
+      box.style.width = '400px';
+      box.style.marginTop = '30vh';
+      box.setAttribute('class', 'box ' + boxName);
+      boxes.appendChild(box);
+      p.textContent = boxName;
+      box.appendChild(p);
+      boxNumber += 1;
+    }
   </script>
 </body>
 
