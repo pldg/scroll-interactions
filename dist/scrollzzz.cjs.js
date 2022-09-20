@@ -130,6 +130,7 @@ function scrollzzz(ref) {
 
   var passive = progress ? addPassiveIfSupported() : false;
   var scrollEvents = [];
+  var enableProgress = progress && unobserve !== 'intersect';
   var isFirstLoad = true;
   var triggerPosition;
 
@@ -210,7 +211,7 @@ function scrollzzz(ref) {
   }
 
   function handleIntersect(entries, observer) {
-    if (progress) { triggerPosition = entries[0].rootBounds.top; }
+    if (enableProgress) { triggerPosition = entries[0].rootBounds.top; }
     if (observe) {
       entries.forEach(function (entry) {
         var position = getPosition(entry);
@@ -218,12 +219,12 @@ function scrollzzz(ref) {
         var targetIndex = parseInt(target.dataset.scrollzzz);
         observe({
           direction: getScrollDirection(),
-          progress: progress ? getProgress(entry) : null,
+          progress: enableProgress ? getProgress(entry) : null,
           position: position,
           entry: entry
         });
-        if (progress && isFirstLoad) { setScrollEvent(entry); }
-        if (progress) { handleScrollEvent(entry, targetIndex); }
+        if (isFirstLoad && enableProgress) { setScrollEvent(entry); }
+        if (enableProgress) { handleScrollEvent(entry, targetIndex); }
         if (unobserve) {
           unobserveTarget(position, target, observer);
           // Cache unobserved targets, if scrollzzz is re-initialized it'll
@@ -310,7 +311,7 @@ function scrollzzz(ref) {
         throw new Error(
           'unobserve must be "onLoad" or "below" or "intersect" or "above"'
         );
-      } else if (progress && unobserve === 'intersecting') {
+      } else if (progress && unobserve === 'intersect') {
         throw new Error('if using progress, unobserve can not be "intersect"');
       }
     }
