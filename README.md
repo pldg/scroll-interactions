@@ -18,10 +18,6 @@ Easy scroll-driven interactions in the browser built on top of [IntersectionObse
 - Access the original IntersectionObserver entry elements.
 - Disconnect IntersectionObserver.
 
-## Use cases
-
-TODO
-
 ## Install
 
 ### NPM
