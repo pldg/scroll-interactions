@@ -29,7 +29,7 @@ npm install --save scroll-interactions
 ### CDN
 
 ```html
-<script src="https://unpkg.com/scroll-interactions/dist/scroll_interactions.iife.min.js"></script>
+<script src="https://unpkg.com/scroll-interactions/dist/scroll-interactions.iife.min.js"></script>
 ```
 
 ## Quick start
