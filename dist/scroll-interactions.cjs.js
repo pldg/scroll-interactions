@@ -1,7 +1,82 @@
-import addPassiveIfSupported from "./utils/add-passive";
-import addThrottle from "./utils/add-throttle";
-import getCoords from "./utils/get-coords";
-import { isNumber, isNonEmptyString } from "./utils/is";
+
+/**
+ * @author Luca Poldelmengo
+ * @license MIT
+ * @see {@link https://github.com/pldg/scroll-interactions}
+ */
+
+'use strict';
+
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+function addPassiveIfSupported() {
+  var passive = false;
+
+  try {
+    var options = {
+      get passive() {
+        passive = {
+          passive: true,
+        };
+      },
+    };
+
+    window.addEventListener("test", null, options);
+    window.removeEventListener("test", null, options);
+  } catch (err) {
+    passive = false;
+  }
+
+  return passive;
+}
+
+function addThrottle(fn, wait) {
+  var time = Date.now();
+
+  return function () {
+    if (time + wait - Date.now() < 0) {
+      fn();
+      time = Date.now();
+    }
+  };
+}
+
+/**
+ * Find element position relative to document
+ * @param {Object} element DOM element
+ * @returns {Object} `{ top, left, height, width, bottom, right }`
+ */
+function getCoords(element) {
+  var scrollTop = window.pageYOffset;
+  var scrollLeft = window.pageXOffset;
+  var clientTop = document.body.clientTop || 0;
+  var clientLeft = document.body.clientLeft || 0;
+
+  var ref = element.getBoundingClientRect();
+  var top = ref.top;
+  var left = ref.left;
+  var height = ref.height;
+  var width = ref.width;
+
+  top = top + scrollTop - clientTop;
+  left = left + scrollLeft - clientLeft;
+
+  return {
+    top: top,
+    left: left,
+    height: height,
+    width: width,
+    bottom: top + height,
+    right: left + width,
+  };
+}
+
+function isNumber(val) {
+  return typeof val === 'number' && !isNaN(parseFloat(val));
+}
+
+function isNonEmptyString(val) {
+  return typeof val === 'string' && val.length > 0;
+}
 
 /**
  * @typedef {Object} options Set scroll-interactions options.
@@ -75,35 +150,35 @@ import { isNumber, isNonEmptyString } from "./utils/is";
  * @param {options}
  * @returns {api}
  */
-export default function scroll_interactions({
-  trigger = 1,
-  progress = false,
-  debug = false,
-  root = null,
-  targets,
-  unobserve,
-  throttle,
-}) {
-  const getScrollDirection = scrollDirection();
-  const passive = progress ? addPassiveIfSupported() : false;
-  const enableProgress = progress && unobserve !== "intersect";
-  const api = {};
-  const unobservedTargets = [];
-  const scrollEvents = [];
-  let isInitialized = false;
-  let isFirstLoad = true;
-  let rootElem;
-  let io;
-  let observe;
-  let triggerPosition;
+function scroll_interactions(ref) {
+  var trigger = ref.trigger; if ( trigger === void 0 ) trigger = 1;
+  var progress = ref.progress; if ( progress === void 0 ) progress = false;
+  var debug = ref.debug; if ( debug === void 0 ) debug = false;
+  var root = ref.root; if ( root === void 0 ) root = null;
+  var targets = ref.targets;
+  var unobserve = ref.unobserve;
+  var throttle = ref.throttle;
+
+  var getScrollDirection = scrollDirection();
+  var passive = progress ? addPassiveIfSupported() : false;
+  var enableProgress = progress && unobserve !== "intersect";
+  var api = {};
+  var unobservedTargets = [];
+  var scrollEvents = [];
+  var isInitialized = false;
+  var isFirstLoad = true;
+  var rootElem;
+  var io;
+  var observe;
+  var triggerPosition;
 
   function scrollDirection() {
-    let previousY = 0;
-    let previousD = "down";
+    var previousY = 0;
+    var previousD = "down";
 
     return function getScrollDirection() {
-      const y = root ? root.scrollTop : window.pageYOffset;
-      let d = previousD;
+      var y = root ? root.scrollTop : window.pageYOffset;
+      var d = previousD;
 
       if (y > previousY || (y === previousY && previousD === "down")) {
         d = "down";
@@ -119,8 +194,8 @@ export default function scroll_interactions({
   }
 
   function showDebugTrigger(rootElem) {
-    const el = document.createElement("div");
-    const text = document.createElement("p");
+    var el = document.createElement("div");
+    var text = document.createElement("p");
 
     el.style.height = "0px";
     el.style.borderTop = "2px dashed grey";
@@ -128,17 +203,19 @@ export default function scroll_interactions({
 
     // Print trigger inside custom root
     if (rootElem) {
-      const { height: rootHeight, width: rootWidth } =
+      var ref =
         rootElem.getBoundingClientRect();
+      var rootHeight = ref.height;
+      var rootWidth = ref.width;
       el.style.position = "absolute";
-      el.style.top = `${trigger * rootHeight + getCoords(rootElem).top}px`;
-      el.style.width = `${rootWidth}px`;
+      el.style.top = (trigger * rootHeight + getCoords(rootElem).top) + "px";
+      el.style.width = rootWidth + "px";
     }
     // Print trigger inside browser window
     else {
       el.style.position = "fixed";
       el.style.width = "100%";
-      el.style.top = `${trigger * 100}vh`;
+      el.style.top = (trigger * 100) + "vh";
     }
 
     el.setAttribute("class", debugTriggerClassName());
@@ -147,20 +224,20 @@ export default function scroll_interactions({
     text.style.color = "grey";
     text.style.margin = "0";
     text.style.padding = "6px";
-    text.innerText = `targets: "${targets}", trigger: ${trigger}`;
+    text.innerText = "targets: \"" + targets + "\", trigger: " + trigger;
 
     el.appendChild(text);
     document.body.appendChild(el);
   }
 
   function debugTriggerClassName() {
-    const e =
+    var e =
       targets[0] === "." || targets[0] === "#" ? targets.substring(1) : targets;
-    return `scroll-interactions--trigger-${e}`;
+    return ("scroll-interactions--trigger-" + e);
   }
 
   function removeDebugTrigger() {
-    const el = document.querySelector(`.${debugTriggerClassName()}`);
+    var el = document.querySelector(("." + (debugTriggerClassName())));
     el.parentNode.removeChild(el);
   }
 
@@ -177,32 +254,32 @@ export default function scroll_interactions({
    * - '-20% 0% -80% 0%' -> 20% from top
    */
   function setRootMargin(trigger) {
-    const margin = trigger * 100;
-    return `-${margin}% 0% -${100 - margin}% 0%`;
+    var margin = trigger * 100;
+    return ("-" + margin + "% 0% -" + (100 - margin) + "% 0%");
   }
 
   function handleIntersect(entries, observer) {
-    if (enableProgress) triggerPosition = entries[0].rootBounds.top;
+    if (enableProgress) { triggerPosition = entries[0].rootBounds.top; }
 
     if (observe) {
-      entries.forEach((entry) => {
-        const position = getPosition(entry);
-        const target = entry.target;
+      entries.forEach(function (entry) {
+        var position = getPosition(entry);
+        var target = entry.target;
         // When accessing `data-` attribute, dash-style are converted to
         // camelCase:
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset#name_conversion
-        const targetIndex = parseInt(target.dataset.scrollInteractions);
+        var targetIndex = parseInt(target.dataset.scrollInteractions);
 
         observe({
           direction: getScrollDirection(),
           progress: enableProgress ? getProgress(entry) : null,
-          position,
-          entry,
+          position: position,
+          entry: entry,
         });
 
-        if (isFirstLoad && enableProgress) setScrollEvent(entry);
+        if (isFirstLoad && enableProgress) { setScrollEvent(entry); }
 
-        if (enableProgress) handleScrollEvent(entry, targetIndex);
+        if (enableProgress) { handleScrollEvent(entry, targetIndex); }
 
         if (unobserve) {
           unobserveTarget(position, target, observer);
@@ -213,82 +290,86 @@ export default function scroll_interactions({
       });
     }
 
-    if (isFirstLoad) isFirstLoad = false;
+    if (isFirstLoad) { isFirstLoad = false; }
   }
 
   function getPosition(entry) {
-    const isIntersecting = entry.isIntersecting;
-    const triggerPosition = entry.rootBounds.top;
-    const isBelow = entry.boundingClientRect.top > triggerPosition;
+    var isIntersecting = entry.isIntersecting;
+    var triggerPosition = entry.rootBounds.top;
+    var isBelow = entry.boundingClientRect.top > triggerPosition;
 
-    if (isIntersecting) return "intersect";
-    else if (!isIntersecting && isBelow) return "below";
-    else return "above";
+    if (isIntersecting) { return "intersect"; }
+    else if (!isIntersecting && isBelow) { return "below"; }
+    else { return "above"; }
   }
 
   function handleScrollEvent(entry, targetIndex) {
-    const isIntersecting = entry.isIntersecting;
-    const { addScroll, removeScroll } = scrollEvents[targetIndex];
+    var isIntersecting = entry.isIntersecting;
+    var ref = scrollEvents[targetIndex];
+    var addScroll = ref.addScroll;
+    var removeScroll = ref.removeScroll;
 
-    if (isIntersecting) addScroll();
+    if (isIntersecting) { addScroll(); }
     // Use `!isFirstLoad` to prevent the listener to be immediately removed if
     // the page is loaded where target already intersect
-    else if (!isIntersecting && !isFirstLoad) removeScroll();
+    else if (!isIntersecting && !isFirstLoad) { removeScroll(); }
   }
 
   // Use this function to build a list of non-initialized scroll event listeners
   // (one for each entry), those listeners will be dynamically initialized only
   // if entry intersect and removed when entry leave the trigger
   function setScrollEvent(entry) {
-    const cb = setScrollCallback(entry);
+    var cb = setScrollCallback(entry);
 
     scrollEvents.push({
-      addScroll: () => window.addEventListener("scroll", cb, passive),
-      removeScroll: () => window.removeEventListener("scroll", cb, passive),
+      addScroll: function () { return window.addEventListener("scroll", cb, passive); },
+      removeScroll: function () { return window.removeEventListener("scroll", cb, passive); },
     });
   }
 
   function setScrollCallback(entry) {
-    if (throttle) return addThrottle(scrollCallback, throttle);
-    else return scrollCallback;
+    if (throttle) { return addThrottle(scrollCallback, throttle); }
+    else { return scrollCallback; }
 
     function scrollCallback(event) {
       observe({
         direction: getScrollDirection(),
         progress: getProgress(entry),
         position: "intersect",
-        entry,
+        entry: entry,
       });
     }
   }
 
   function getProgress(entry) {
-    const { top: targetTop, height: targetHeight } =
+    var ref =
       entry.target.getBoundingClientRect();
-    const progress = 1 / (targetHeight / (triggerPosition - targetTop));
+    var targetTop = ref.top;
+    var targetHeight = ref.height;
+    var progress = 1 / (targetHeight / (triggerPosition - targetTop));
 
-    if (progress < 0) return 0;
-    else if (progress > 1) return 1;
-    else return parseFloat(progress.toFixed(4));
+    if (progress < 0) { return 0; }
+    else if (progress > 1) { return 1; }
+    else { return parseFloat(progress.toFixed(4)); }
   }
 
   function unobserveTarget(position, target, observer) {
-    const onLoad = unobserve === "onLoad";
-    const below = unobserve === "below" && position === "below";
-    const intersect = unobserve === "intersect" && position === "intersect";
-    const above = unobserve === "above" && position === "above";
+    var onLoad = unobserve === "onLoad";
+    var below = unobserve === "below" && position === "below";
+    var intersect = unobserve === "intersect" && position === "intersect";
+    var above = unobserve === "above" && position === "above";
 
-    if (onLoad || below || intersect || above) observer.unobserve(target);
+    if (onLoad || below || intersect || above) { observer.unobserve(target); }
   }
 
   function checkOptionsErrors() {
-    if (!isNonEmptyString(targets)) errorDomSelector("targets");
+    if (!isNonEmptyString(targets)) { errorDomSelector("targets"); }
 
     if (!isNumber(trigger) || trigger > 1 || trigger < 0)
-      throw new Error("`trigger` must be a number in 0..1 range");
+      { throw new Error("`trigger` must be a number in 0..1 range"); }
 
     if (unobserve) {
-      const c =
+      var c =
         ["onLoad", "below", "intersect", "above"].indexOf(unobserve) > -1;
       if (!c) {
         throw new Error(
@@ -305,10 +386,10 @@ export default function scroll_interactions({
       throw new Error("`throttle` must be a number > 0");
     }
 
-    if (root && !isNonEmptyString(root)) errorDomSelector("root");
+    if (root && !isNonEmptyString(root)) { errorDomSelector("root"); }
 
     function errorDomSelector(optionName) {
-      throw new Error(`\`${optionName}\` must be a valid DOM selector`);
+      throw new Error(("`" + optionName + "` must be a valid DOM selector"));
     }
   }
 
@@ -316,28 +397,28 @@ export default function scroll_interactions({
     throw new Error("`scroll-interactions` has not been initialized");
   }
 
-  api.init = () => {
+  api.init = function () {
     if (isInitialized)
-      throw new Error("`scroll-interactions` has been already initialized");
-    else checkOptionsErrors();
+      { throw new Error("`scroll-interactions` has been already initialized"); }
+    else { checkOptionsErrors(); }
 
-    if (isNonEmptyString(root)) rootElem = document.querySelector(root);
+    if (isNonEmptyString(root)) { rootElem = document.querySelector(root); }
 
-    if (debug === true) showDebugTrigger(rootElem);
+    if (debug === true) { showDebugTrigger(rootElem); }
 
     io = new IntersectionObserver(handleIntersect, {
       rootMargin: setRootMargin(trigger),
       root: rootElem || null,
     });
 
-    [].slice.call(document.querySelectorAll(targets)).forEach((el, i) => {
+    [].slice.call(document.querySelectorAll(targets)).forEach(function (el, i) {
       if (!el.hasAttribute("data-scroll-interactions")) {
         // Use setAttribute to track targets for scroll events and cache
         // unobserved targets
         el.setAttribute("data-scroll-interactions", i);
       }
 
-      if (unobservedTargets.indexOf(i) === -1) io.observe(el);
+      if (unobservedTargets.indexOf(i) === -1) { io.observe(el); }
     });
 
     isInitialized = true;
@@ -345,19 +426,25 @@ export default function scroll_interactions({
     return api;
   };
 
-  api.observe = (fn) => {
-    if (!isInitialized) errorNotInitialized();
-    if (typeof fn === "function") observe = fn;
-    else throw new Error("`observe` requires a function");
+  api.observe = function (fn) {
+    if (!isInitialized) { errorNotInitialized(); }
+    if (typeof fn === "function") { observe = fn; }
+    else { throw new Error("`observe` requires a function"); }
 
     return api;
   };
 
-  api.disconnect = (emptyCache = false) => {
-    if (!isInitialized) errorNotInitialized();
-    if (progress) scrollEvents.forEach(({ removeScroll }) => removeScroll());
-    if (debug === true) removeDebugTrigger();
-    if (emptyCache) unobservedTargets.splice(0);
+  api.disconnect = function (emptyCache) {
+    if ( emptyCache === void 0 ) emptyCache = false;
+
+    if (!isInitialized) { errorNotInitialized(); }
+    if (progress) { scrollEvents.forEach(function (ref) {
+      var removeScroll = ref.removeScroll;
+
+      return removeScroll();
+      }); }
+    if (debug === true) { removeDebugTrigger(); }
+    if (emptyCache) { unobservedTargets.splice(0); }
 
     io.disconnect();
     isInitialized = false;
@@ -365,7 +452,10 @@ export default function scroll_interactions({
     return api;
   };
 
-  api.update = (options = {}, emptyCache = false) => {
+  api.update = function (options, emptyCache) {
+    if ( options === void 0 ) options = {};
+    if ( emptyCache === void 0 ) emptyCache = false;
+
     api.disconnect(emptyCache);
 
     targets = options.targets || targets;
@@ -383,3 +473,5 @@ export default function scroll_interactions({
 
   return Object.freeze(api);
 }
+
+module.exports = scroll_interactions;
