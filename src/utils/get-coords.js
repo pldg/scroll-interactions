@@ -8,14 +8,12 @@ export default function getCoords(element) {
   const scrollLeft = window.pageXOffset;
   const clientTop = document.body.clientTop || 0;
   const clientLeft = document.body.clientLeft || 0;
-  let {
-    top,
-    left,
-    height,
-    width
-  } = element.getBoundingClientRect();
+
+  let { top, left, height, width } = element.getBoundingClientRect();
+
   top = top + scrollTop - clientTop;
   left = left + scrollLeft - clientLeft;
+
   return {
     top,
     left,
