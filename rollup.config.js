@@ -1,58 +1,64 @@
-import buble from 'rollup-plugin-buble';
-import { terser } from 'rollup-plugin-terser';
-import pkg from './package.json';
+import buble from "rollup-plugin-buble";
+import { terser } from "rollup-plugin-terser";
+import pkg from "./package.json";
 
-const licence =
-  `/**
- * @license MIT
+const license = `
+/**
  * @author Luca Poldelmengo
- * @see {@link https://github.com/pldg/scrollzzz}
+ * @license MIT
+ * @see {@link https://github.com/pldg/scroll-interactions}
  */
 `;
 
-const input = 'src/index.js';
-const output_cjs = 'dist/scrollzzz.cjs.js';
-const output_iife = 'dist/scrollzzz.iife.js';
-const output_umd = 'dist/scrollzzz.umd.js';
-const output_esm = 'dist/scrollzzz.esm.js';
+const input = "src/index.js";
 
-function addPlugins({
-  transpile = false,
-  minify = false
-} = {}) {
+const output_cjs = "dist/scroll-interactions.cjs.js";
+const output_iife = "dist/scroll-interactions.iife.js";
+const output_umd = "dist/scroll-interactions.umd.js";
+const output_esm = "dist/scroll-interactions.esm.js";
+
+function addPlugins({ transpile = false, minify = false } = {}) {
   const p = [];
+
   if (transpile) {
     p.push(
       // Note: Spread operator doesn't work on array-like objects (for example
       // dom list): https://github.com/bublejs/buble/issues/131
       buble({
-        exclude: ['node_modules/**']
+        exclude: ["node_modules/**"],
       })
     );
   }
+
   if (minify) {
     p.push(
       terser({
         output: {
-          // Preserve licence comments
-          comments: 'some'
-        }
+          // Preserve license comments
+          comments: "some",
+        },
       })
     );
   }
-  return p;
-};
 
-function addOutput({
-  file,
-  format,
-  minify
-}) {
+  return p;
+}
+
+function addOutput({ file, format, minify }) {
+  // https://rollupjs.org/guide/en/#outputname
+  //
+  // The iife and umd builds expose a global variable: use a valid JS
+  // identifier as name of the package
+  const name =
+    format === "iife" || format === "umd"
+      ? pkg.name.replace("-", "_")
+      : undefined;
+
   return {
-    banner: licence,
-    name: pkg.name,
-    file: minify ? file.replace(/.js$/i, '.min.js') : file,
-    format
+    banner: license,
+    file: minify ? file.replace(/.js$/i, ".min.js") : file,
+    name,
+    format,
   };
 }
 
@@ -62,63 +68,64 @@ export default [
     output: [
       addOutput({
         file: output_iife,
-        format: 'iife'
+        format: "iife",
       }),
       addOutput({
         file: output_umd,
-        format: 'umd'
+        format: "umd",
       }),
       addOutput({
         file: output_cjs,
-        format: 'cjs'
+        format: "cjs",
       }),
     ],
     plugins: addPlugins({
-      transpile: true
-    })
+      transpile: true,
+    }),
   },
   {
     input,
     output: addOutput({
       file: output_esm,
-      format: 'es'
-    })
+      format: "es",
+    }),
   },
 
   // Minify versions:
+
   {
     input,
     output: [
       addOutput({
         file: output_iife,
-        format: 'iife',
-        minify: true
+        format: "iife",
+        minify: true,
       }),
       addOutput({
         file: output_umd,
-        format: 'umd',
-        minify: true
+        format: "umd",
+        minify: true,
       }),
       addOutput({
         file: output_cjs,
-        format: 'cjs',
-        minify: true
+        format: "cjs",
+        minify: true,
       }),
     ],
     plugins: addPlugins({
       transpile: true,
-      minify: true
-    })
+      minify: true,
+    }),
   },
   {
     input,
     output: addOutput({
       file: output_esm,
-      format: 'es',
-      minify: true
+      format: "es",
+      minify: true,
     }),
     plugins: addPlugins({
-      minify: true
-    })
-  }
+      minify: true,
+    }),
+  },
 ];
