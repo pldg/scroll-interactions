@@ -1,7 +1,76 @@
-import addPassiveIfSupported from "./utils/add-passive";
-import addThrottle from "./utils/add-throttle";
-import getCoords from "./utils/get-coords";
-import { isNumber, isNonEmptyString } from "./utils/is";
+
+/**
+ * @author Luca Poldelmengo
+ * @license MIT
+ * @see {@link https://github.com/pldg/scroll-interactions}
+ */
+
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners
+function addPassiveIfSupported() {
+  let passive = false;
+
+  try {
+    const options = {
+      get passive() {
+        passive = {
+          passive: true,
+        };
+      },
+    };
+
+    window.addEventListener("test", null, options);
+    window.removeEventListener("test", null, options);
+  } catch (err) {
+    passive = false;
+  }
+
+  return passive;
+}
+
+function addThrottle(fn, wait) {
+  let time = Date.now();
+
+  return function () {
+    if (time + wait - Date.now() < 0) {
+      fn();
+      time = Date.now();
+    }
+  };
+}
+
+/**
+ * Find element position relative to document
+ * @param {Object} element DOM element
+ * @returns {Object} `{ top, left, height, width, bottom, right }`
+ */
+function getCoords(element) {
+  const scrollTop = window.pageYOffset;
+  const scrollLeft = window.pageXOffset;
+  const clientTop = document.body.clientTop || 0;
+  const clientLeft = document.body.clientLeft || 0;
+
+  let { top, left, height, width } = element.getBoundingClientRect();
+
+  top = top + scrollTop - clientTop;
+  left = left + scrollLeft - clientLeft;
+
+  return {
+    top,
+    left,
+    height,
+    width,
+    bottom: top + height,
+    right: left + width,
+  };
+}
+
+function isNumber(val) {
+  return typeof val === 'number' && !isNaN(parseFloat(val));
+}
+
+function isNonEmptyString(val) {
+  return typeof val === 'string' && val.length > 0;
+}
 
 /**
  * @typedef {Object} options Set scroll-interactions options.
@@ -75,7 +144,7 @@ import { isNumber, isNonEmptyString } from "./utils/is";
  * @param {options}
  * @returns {api}
  */
-export default function scroll_interactions({
+function scroll_interactions({
   trigger = 1,
   progress = false,
   debug = false,
@@ -383,3 +452,5 @@ export default function scroll_interactions({
 
   return Object.freeze(api);
 }
+
+export default scroll_interactions;
