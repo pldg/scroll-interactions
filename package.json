@@ -1,10 +1,10 @@
 {
-  "name": "scrollzzz",
+  "name": "scroll-interactions",
   "version": "0.7.0",
-  "description": "Easy scroll-driven interactions using IntersectionObserver",
-  "main": "dist/scrollzzz.cjs.js",
-  "module": "dist/scrollzzz.esm.js",
-  "browser": "dist/scrollzzz.umd.js",
+  "description": "Easy scroll-driven interactions in the browser built on top of IntersectionObserver",
+  "main": "dist/scroll-interactions.cjs.js",
+  "module": "dist/scroll-interactions.esm.js",
+  "browser": "dist/scroll-interactions.umd.js",
   "files": [
     "dist"
   ],
@@ -13,35 +13,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pldg/scrollzzz.git"
+    "url": "git+https://github.com/pldg/scroll-interactions.git"
   },
   "scripts": {
-    "server": "npx http-server docs/",
     "build": "rollup -c --environment prod",
-    "postbuild": "cp ./dist/scrollzzz.iife.js ./docs/scrollzzz.iife.js",
-    "dev": "rollup -c -w --environment dev"
+    "postbuild": "cp ./dist/scroll-interactions.iife.js ./docs/scroll-interactions.iife.js",
+    "server": "npx http-server docs/",
+    "upgrade-dependencies": "npx npm-check-updates -u && npm i"
   },
   "keywords": [
     "scroll",
-    "onScroll",
-    "scroll-driven",
-    "scroll-direction",
     "scrollytelling",
-    "IntersectionObserver",
-    "observer",
     "observe",
     "intersect",
-    "intersecting",
     "trigger",
-    "event",
-    "enter",
-    "leave",
-    "exit",
     "direction",
-    "up",
-    "down",
-    "view",
-    "viewport"
+    "visibility",
+    "browser",
+    "viewport",
+    "element",
+    "IntersectionObserver"
   ],
   "author": {
     "email": "luca.poldelmengo@gmail.com",
@@ -50,9 +41,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pldg/scrollzzz/issues"
+    "url": "https://github.com/pldg/scroll-interactions/issues"
   },
-  "homepage": "https://github.com/pldg/scrollzzz#readme",
+  "homepage": "https://github.com/pldg/scroll-interactions#readme",
   "devDependencies": {
     "rollup": "^2.79.0",
     "rollup-plugin-buble": "^0.19.8",
