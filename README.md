@@ -1,8 +1,5 @@
 # `scroll-interactions`
 
-![size-badge](https://img.shields.io/github/size/pldg/scroll-interactions/dist/scroll-interactions.esm.min.js)
-![downloads-badge](https://img.shields.io/npm/dt/scroll-interactions.svg)
-
 ## Introduction
 
 Easy scroll-driven interactions in the browser built on top of [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API). Set a hidden trigger line in the browser viewport and see how one or more elements relate to it. This package tells you when an element is above, below or intersect the trigger line. If the element intersect the trigger it can also calculate the percent of completion relative to the element's top border.
@@ -68,7 +65,7 @@ Go to [API](api.md) page.
 
 The `observe()` method works as callback handler of [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API), it fires one time on first page load, then it fires only when a target element enter or exit the trigger line.
 
-If `progress: true` and a target element intersect the trigger line, a scroll event listener is added to keep track of `progress`, when the element leave the trigger line the event listener is removed (it make use of [passive](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Improving_scrolling_performance_with_passive_listeners) to improve performance).
+If `progress: true` and a target element intersect the trigger line, a scroll event listener is added to keep track of `progress`, when the element leave the trigger line the event listener is removed.
 
 When you use `unobserve` option, all targets that has been unobserved will be cached, if scroll-interactions is re-initialize it'll not observe them again (see [*docs/unobserve*](docs/unobserve/index.html) example), you can also empty the cache if needed (read [API](api.md) for reference).
 
