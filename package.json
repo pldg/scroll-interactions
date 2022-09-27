@@ -1,6 +1,6 @@
 {
   "name": "scroll-interactions",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Easy scroll-driven interactions in the browser built on top of IntersectionObserver",
   "main": "dist/scroll-interactions.cjs.js",
   "module": "dist/scroll-interactions.esm.js",
