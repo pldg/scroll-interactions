@@ -87,7 +87,7 @@ Add `progress` to [`observe()`](#observeresults) method. Track the percent of co
 
 Add throttle in millisecond to scroll event listener.
 
-Note: Only works if `options.progress: true`.
+Note: Only works if [`options.progress: true`](#optionsprogress).
 
 ### `options.root`
 
@@ -147,7 +147,7 @@ You've access to one argument, an object with those properties:
 - `progress` percent of completion relative to the target top border.
 - `entry` original IntersectionObserver entry.
 
-Note: `progress` only works if only if `options.progress: true`.
+Note: `progress` only works if only if [`options.progress: true`](#optionsprogress).
 
 ### `disconnect(emptyCache)`
 
